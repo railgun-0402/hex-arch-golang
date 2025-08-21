@@ -1,0 +1,38 @@
+# https://taskfile.dev
+
+version: '3'
+
+dotenv:
+  - ".env"
+
+vars:
+  CONTAINER_NAME: go-unittest-architecture-db
+
+tasks:
+  default:
+    cmds:
+      - echo 'Hello World from Task!'
+    silent: true
+    desc: 'Hello Test Task.'
+
+  db:run:
+    cmds:
+      - sudo docker run --rm --name {{.CONTAINER_NAME}}
+        -p $MYSQL_PORT:$MYSQL_PORT
+        -e MYSQL_ROOT_PASSWORD=$MYSQL_PASS
+        -e MYSQL_DATABASE=$MYSQL_DBNAME
+        -d mysql:latest
+    silent: true
+    desc: 'Run MySQL container.'
+
+  db:connect:
+    cmds:
+      - docker exec -it {{.CONTAINER_NAME}} mysql -uroot -p$MYSQL_PASS $MYSQL_DBNAME
+    silent: true
+    desc: 'Connect MySQL container.'
+
+  db:stop:
+    cmds:
+      - docker stop {{.CONTAINER_NAME}}
+    silent: true
+    desc: 'Stop MySQL container.When stop, container remove.'
