@@ -7,6 +7,7 @@ dotenv:
 
 vars:
   CONTAINER_NAME: go-unittest-architecture-db
+  MIGRATIONS_PATH: migrations
 
 tasks:
   default:
@@ -36,3 +37,15 @@ tasks:
       - docker stop {{.CONTAINER_NAME}}
     silent: true
     desc: 'Stop MySQL container.When stop, container remove.'
+
+  migrate:create:
+    cmds:
+      - migrate create -ext sql -dir {{.MIGRATIONS_PATH}} -seq {{.CLI_ARGS}}
+    desc: 'Create migration file.Migration name must be specified as an argument.ex) task migrate:create -- create_user_table'
+
+  migrate:up:
+    cmds:
+      - migrate --path {{.MIGRATIONS_PATH}}
+        --database "mysql://$MYSQL_USER:$MYSQL_PASS@tcp($MYSQL_HOST:$MYSQL_PORT)/$MYSQL_DBNAME"
+        -verbose up
+    desc: 'Execution migration up.'
